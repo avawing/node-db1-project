@@ -17,6 +17,7 @@ server.get("/api/accounts", (req, res) => {
 server.get("/api/accounts/:id", (req, res) => {
 
   const id = req.params.id
+
   db("accounts")
     .where({ id })
     .then((users) => {
@@ -37,11 +38,30 @@ server.get("/api/accounts/:id", (req, res) => {
 });
 
 server.post("/api/accounts", (req, res) => {
-  res.send("Woo").end();
   if (req.body.name === "" || req.body.budget === "") {
     res.status(400).json({ message: "Bad Request" }).end();
   } else {
-    res.status(500).json({ message: "Back End Went Fucky" });
+   db("accounts").insert(req.body)
+   .then(user => {
+       if(user.length){
+           db("accounts").where({id: user[0]})
+           .then(user=>{
+               if(user.length){
+                res.status(201).json(user[0]).end()
+               } else {
+                   res.status(500).json({message: "User could not be added"}).end()
+               }
+           }).catch(err => {
+               res.status(500).json({message: "Something happened"}).end()
+           })
+           
+       }else{
+           res.status(400).json({message: "user could not be added"}).end()
+       }
+   })
+   .catch(err => {
+       res.status(500).json({message: "Database error"}).end()
+   })
   }
 });
 server.put("/api/accounts/:id", (req, res) => {
