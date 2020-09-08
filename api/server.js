@@ -15,8 +15,7 @@ server.get("/api/accounts", (req, res) => {
 });
 
 server.get("/api/accounts/:id", (req, res) => {
-
-  const id = req.params.id
+  const id = req.params.id;
 
   db("accounts")
     .where({ id })
@@ -41,42 +40,83 @@ server.post("/api/accounts", (req, res) => {
   if (req.body.name === "" || req.body.budget === "") {
     res.status(400).json({ message: "Bad Request" }).end();
   } else {
-   db("accounts").insert(req.body)
-   .then(user => {
-       if(user.length){
-           db("accounts").where({id: user[0]})
-           .then(user=>{
-               if(user.length){
-                res.status(201).json(user[0]).end()
-               } else {
-                   res.status(500).json({message: "User could not be added"}).end()
-               }
-           }).catch(err => {
-               res.status(500).json({message: "Something happened"}).end()
-           })
-           
-       }else{
-           res.status(400).json({message: "user could not be added"}).end()
-       }
-   })
-   .catch(err => {
-       res.status(500).json({message: "Database error"}).end()
-   })
+    db("accounts")
+      .insert(req.body)
+      .then((user) => {
+        if (user.length) {
+          db("accounts")
+            .where({ id: user[0] })
+            .then((user) => {
+              if (user.length) {
+                res.status(201).json(user[0]).end();
+              } else {
+                res
+                  .status(500)
+                  .json({ message: "User could not be added" })
+                  .end();
+              }
+            })
+            .catch((err) => {
+              res.status(500).json({ message: "Something happened" }).end();
+            });
+        } else {
+          res.status(400).json({ message: "user could not be added" }).end();
+        }
+      })
+      .catch((err) => {
+        res.status(500).json({ message: "Database error" }).end();
+      });
   }
 });
 server.put("/api/accounts/:id", (req, res) => {
-  res.send("Woo hoo").end();
-  //logic to find req.params.id 404 err
-  if (req.body.name === "" || req.body.budget === "") {
-    res.status(400).json({ message: "Nope" }).end();
-  } else {
-    res.status(500).json({ message: "Back End Went Fucky" });
-  }
+    const id = req.params.id
+    if (req.body.name === "" || req.body.budget === "") {
+        res.status(400).json({ message: "Bad Request" }).end();
+      } else {
+        db("accounts")
+        .where({ id })
+          .update(req.body)
+          .then((user) => {
+            if (user.length) {
+              db("accounts")
+                .where({ id })
+                .then((user) => {
+                  if (user.length) {
+                    res.status(201).json(user).end();
+                  } else {
+                    res
+                      .status(404)
+                      .json({ message: "User could not be found" })
+                      .end();
+                  }
+                })
+                .catch((err) => {
+                  res.status(500).json({ message: "Something happened" }).end();
+                });
+            } else {
+              res.status(400).json({ message: "user could not be added" }).end();
+            }
+          })
+          .catch((err) => {
+            res.status(500).json({ message: "Database error" }).end();
+          });
+      }
 });
 server.delete("api/accounts/:id", (req, res) => {
-  res.send("DELETED").end();
-  //log to find req.params.id 404 err
-  //res.status 500
+const id = req.params.id
+db("accounts")
+.where({ id })
+.del()
+.then(num => {
+    if(num = 1){
+        res.status(204).json({message: "user deleted"}).end()
+    }else{
+        res.status(404).json({message: "user could not be found/deleted"}).end()
+    }
+})
+.catch(err => {
+    res.status(500).json({message: "somethin went wrong"}).end()
+})
 });
 
 module.exports = server;
