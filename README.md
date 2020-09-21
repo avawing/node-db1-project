@@ -14,7 +14,7 @@ For this lab you will:
 - write API endpoints to manage the `accounts` resource, including database logic
 
 ### Write Basic Queries
-
+### DONE ###
 Visit [SQL Try Editor at W3Schools.com](https://www.w3schools.com/Sql/trysql.asp?filename=trysql_select_all) using the **Google Chrome (or Chromium if you use Linux) browser** and write _SQL queries_ for the following requirements:
 
 - find all customers with postal code 1010. Returns 3 records.
